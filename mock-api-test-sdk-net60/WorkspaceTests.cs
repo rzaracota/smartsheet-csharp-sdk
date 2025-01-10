@@ -7,6 +7,15 @@ namespace mock_api_test_sdk_net60
     [TestClass]
     public class WorkspaceTests
     {
+        private Workspace createWorkspace(SmartsheetClient client, string workspaceName) {
+            Workspace workspace = new Workspace();
+
+            workspace.Name = workspaceName;
+
+            return client.WorkspaceResources.CreateWorkspace(workspace);
+        }
+
+
         [TestMethod]
         public void CreateWorkspace_Success()
         {
@@ -26,13 +35,19 @@ namespace mock_api_test_sdk_net60
         }
 
         [TestMethod]
-        public void ListSheets_IncludeOwnerInfo()
+        public void CreateFolder_Success()
         {
-            SmartsheetClient ss = HelperFunctions.SetupClient("List Sheets - Include Owner Info");
+            SmartsheetClient client = HelperFunctions.SetupClient("Create Folder in Workspace - Valid");
 
-            PaginatedResult<Sheet> sheets = ss.SheetResources.ListSheets(new List<SheetInclusion> { SheetInclusion.OWNER_INFO }, null);
+            Folder newFolder = new Folder();
 
-            Assert.IsNotNull(sheets.Data.Where(s => s.Owner.Equals("john.doe@smartsheet.com")).FirstOrDefault());
+            newFolder.Name = "New Folder";
+
+            Folder folder = client.WorkspaceFolderResources.CreateFolder(12345, newFolder);
+
+            Assert.IsNotNull(folder);
+            Assert.IsNotNull(folder.Name);
+            Assert.AreEqual("New Folder", folder.Name);
         }
 
         [TestMethod]
